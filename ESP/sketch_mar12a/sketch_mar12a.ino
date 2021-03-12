@@ -103,9 +103,10 @@ void loop() {
   int gas_val=read_gas(gas_pin);
   char gas[7];
   to_char_array(gas_val, gas);
+  
   client.publish(TOPIC_GAS, gas);
   //Serial.println((String)TOPIC_GAS);
-  //Serial.println(gas);
+  Serial.println(gas);
 
   delay(100);
   
@@ -133,7 +134,7 @@ void loop() {
       dust_error=0;
     }
   }
-  if(gas_val>700){
+  if(gas_val>1300){
     gas_error++;
     if(gas_error>GAS_TOLERANCE){
       buzz();
@@ -261,7 +262,9 @@ int read_gas(int analog_pin){
   for(int i=0;i<50;i++){
     k+=analogRead(analog_pin);
   }
+  
   k/=50;
+  //Serial.println(k);
   return k;
 }
 
