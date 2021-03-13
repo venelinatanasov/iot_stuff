@@ -54,7 +54,7 @@ class DB_data(db.Document):
 		timestamp = db.DateTimeField()
 
 		def to_json(self):
-			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity}
+			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity, "timestamp": self.timestamp}
 
 #class to hold data locally
 class Room:
@@ -64,7 +64,7 @@ class Room:
 		self.gas = gas
 		self.dust = dust
 		self.humidity = humidity 
-		self.timestamp = 0
+		self.timestamp = dt.datetime.utcnow
 
 	def update(self, temperature, light, gas, dust, humidity): 
 		self.temperature = temperature
@@ -72,6 +72,7 @@ class Room:
 		self.gas = gas
 		self.dust = dust
 		self.humidity = humidity 
+		self.timestamp = dt.datetime.utcnow
 	
 	def update_temperature(self, temperature): 
 		self.temperature = temperature
