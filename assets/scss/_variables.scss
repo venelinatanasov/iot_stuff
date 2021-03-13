@@ -1,0 +1,30 @@
+
+$h: 4rem;
+$w: $h * 3;
+$tw: $h * 1.2;
+$fs: 1rem;
+$bt: 0.1rem;
+$bs: $bt * 2;
+$ta: 6s;
+$text-color: white;
+$colors: #5ca15c, #ee8840, #c44545;
+
+@mixin borderColor($i) {
+  border: $bt solid nth($colors, $i);
+  background: lighten(nth($colors, $i), 10%);
+  box-shadow: 0 0 $bs $bs/2 nth($colors, $i) inset, 0 0 $bs $bs/2 nth($colors, $i);
+}
+
+@mixin animationDelay($time) {
+  -webkit-animation-delay: $time;
+  -o-animation-delay: $time;
+  -moz-animation-delay: $time;
+  animation-delay: $time;
+}
+
+@mixin animation($time) {
+  -webkit-animation: $time rot-label ease-in-out infinite;
+  -moz-animation: $time rot-label ease-in-out infinite;
+  -o-animation: $time rot-label ease-in-out infinite;
+  animation: $time rot-label ease-in-out infinite;
+}

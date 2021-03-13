@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from flask_scss import Scss
 from flask_mqtt import Mqtt
 from flask_mongoengine import MongoEngine
+from flask_socketio import SocketIO
 import time, threading
 import datetime as dt
 # import pymongo
@@ -43,6 +44,9 @@ app.config['MQTT_PASSWORD'] = ''
 app.config['MQTT_REFRESH_TIME'] = 1.0  # refresh time in seconds
 mqtt = Mqtt(app)
 
+#setting up socketio
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, async_mode="threading")
 
 #model for room_data to be saved in DB
 class DB_data(db.Document):
@@ -154,6 +158,28 @@ send_data_to_DB();
 @app.route('/')
 def index():
 	return render_template('index.html')
+
+@app.route('/on', methods = ['POST', 'GET'])
+def turn_light_on():
+	if request.method == 'POST':
+		mqtt.publish('lights/on_off', 1)
+		mqtt.publish('lights/auto', 0)
+	return jsonify({'lights' : 1})
+
+@app.route('/off', methods = ['POST', 'GET'])
+def turn_light_off():
+	if request.method == 'POST':
+		mqtt.publish('lights/on_off', 0)
+		mqtt.publish('lights/auto', 0)
+	return jsonify({'lights' : 0})
+
+@app.route('/auto', methods = ['POST', 'GET'])
+def turn_light_auto():
+	if request.method == 'POST':
+		# mqtt.publish('lights/on_off', 0)
+		mqtt.publish('lights/auto', 1)
+	return jsonify({'lights' : 0})
+
 
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')

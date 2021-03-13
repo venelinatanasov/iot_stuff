@@ -16,14 +16,76 @@
 	<header class="header-wrapper">
 	</header>
 	<main class="body-wrapper text">
-    <h1 class="title">HomeAuto</h1>
-    <h2 class="subtitle">Smart home automation system,</h2>
-    <h2 class="subtitle">designed to save energy</h2>
+    <h1 class="title text-shadow">HomeAuto</h1>
+    <h2 class="subtitle text-shadow">Smart home automation system,</h2>
+    <h2 class="subtitle text-shadow">designed to save energy</h2>
     <button class="button"><p class="button-text">Try it</p></button>
+
+    <form class="toggle-wrapper">
+      <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="0" name="choice_radio" id="yes_radio" onclick="turn_on();">
+      <label for="maybe_radio" id="maybe-lbl">auto</label><input type="radio" value="0" name="choice_radio" id="maybe_radio" checked="checked" onclick="turn_auto();">
+      <label for="no_radio" id="no-lbl">off</label><input type="radio" value="0" name="choice_radio" id="no_radio" onclick="turn_off();">
+      
+      <div class="toggle"></div>
+    </form>
   </main>
 	<footer class="footer-wrapper">
 	</footer>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script> -->
+  <!-- <script src='http://localhost:5000/socket.io/socket.io.js'></script> -->
+  <script>
+    // const socket = io.connect('http://' + document.domain + ':' + location.port + '/socket.io/socket.io.js');
+    
+    function turn_on() {
+      // event.preventDefault();
+      $.ajax({
+				data : {
+					light : 1
+				},
+				type: 'POST',
+				url: '/on'
+			})
+			.done(function(data) {
+				console.log("Light will be turned on") 
+			});
+      
+      return 200;
+    }
+    function turn_off() {
+      // event.preventDefault();
+
+      $.ajax({
+				data : {
+					light : 1
+				},
+				type: 'POST',
+				url: '/off'
+			})
+			.done(function(data) {
+				console.log("Light will be turned off") 
+			});
+      return 200;
+    }
+    function turn_auto() {
+      // event.preventDefault();
+      
+        
+      $.ajax({
+				data : {
+					light : 2
+				},
+				type: 'POST',
+				url: '/auto'
+			})
+			.done(function(data) {
+				console.log("Light will be automatically turned on or off")
+			});
+
+      return 200;
+    }
+  </script>
 </body>
 </html
