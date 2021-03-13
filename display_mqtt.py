@@ -18,14 +18,21 @@ global temperature
 global humidity
 
 global gas_outside
-global gas_outside
+global humidity_outside
 global temperature_outside
+global light_outside
+
+
 gas='0'
 light='0'
 dust='0'
 temperature='0'
 humidity='0'
 gas_outside='0'
+humidity_outside='0'
+temperature_outside='0'
+light_outside='0'
+
 #def on_message(client, userdata, message):
  #   global= MQTTdata = str(message.payload.decode("utf-8"))
     
@@ -72,7 +79,23 @@ def on_humidity_room(client, userdata, message):
 def on_gas_outside(client, userdata, message):
     global gas_outside
     gas_outside = "Gas outside: " + str(message.payload.decode("utf-8")) + "%"
-    print(gas_outside)
+    #print(gas_outside)
+
+def on_humidity_outside(client, userdata, message):
+    global humidity_outside
+    humidity_outside = "Humidity outside: " + str(message.payload.decode("utf-8")) + "%"
+    print(humidity_outside)
+
+def on_temperature_outside(client, userdata, message):
+    global temperature_outside
+    temperature_outside = "T outside: " + str(message.payload.decode("utf-8")) + " C"
+    print(temperature_outside)
+
+def on_light_outside(client, userdata, message):
+    global light_outside
+    light_outside = "Light outside: " + str(message.payload.decode("utf-8")) + "lux"
+    print(light_outside)
+
 
 cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D26)
@@ -125,7 +148,9 @@ client.message_callback_add("room/humidity", on_humidity_room)
 
 client.subscribe("outside/#",0)
 client.message_callback_add("outside/gas", on_gas_outside)
-
+client.message_callback_add("outside/light", on_light_outside)
+client.message_callback_add("outside/temperature", on_temperature_outside)
+client.message_callback_add("outside/humidity", on_humidity_outside)
 #client.on_message=on_message
 client.loop_start()
 while(True):
@@ -177,10 +202,12 @@ while(True):
     #IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
     y=padding
 
+
     
     t_end=time.time() + 5
     while(time.time()<t_end):
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
+        y = padding
         #cmd = "hostname -I | cut -d' ' -f1"
         #IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
         cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
@@ -192,7 +219,7 @@ while(True):
         cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  
         Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
         # Write four lines of text.
-        y = padding
+        
         #draw.text((x, y), IP, font=font, fill="#FFFFFF")
         #y += font.getsize(IP)[1]
         draw.text((x, y), CPU, font=font, fill="#FFFF00")
@@ -205,8 +232,14 @@ while(True):
         y += font.getsize(Temp)[1]
         #draw.rectangle((0, 0, width, height), outline=0, fill=0)
         
-        draw.text((x, y), gas_outside, font=font, fill="#FFFF00")
+        draw.text((x, y), gas_outside, font=font, fill="#23C2AA")
         y += font.getsize(gas_outside)[1]
+        #draw.text((x, y), light_outside, font=font, fill="#FFFF00")
+        #y += font.getsize(light_outside)[1]
+        draw.text((x, y), humidity_outside, font=font, fill="#F5A442")
+        y += font.getsize(humidity_outside)[1]
+        draw.text((x, y), temperature_outside, font=font, fill="#0000FF")
+        y += font.getsize(temperature_outside)[1]
         disp.image(image)
         time.sleep(0.1)
     pass
