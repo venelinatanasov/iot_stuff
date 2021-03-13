@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from flask_scss import Scss
 from flask_mqtt import Mqtt
 from flask_mongoengine import MongoEngine
-import time
+import time, threading
 # import pymongo
 
 # import RPi.GPIO as GPIO
@@ -10,20 +10,22 @@ import time
 # from os import system
 # import multiprocessing
 starttime = time.time()
+threads_arr = []
 
 app = Flask(__name__)
 app.testing = True
 
-#MongoDB settings
+#MongoDB settings + client
+DB_URI = "mongodb+srv://iliana:moje@autohome.acegw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 app.config['MONGODB_SETTINGS'] = {
 		'db': 'data',
-		'host': 'localhost',
+		'host': DB_URI,
 		'port': 27017
 }
 
 #setting up Mongo client 
-DB_URI = "mongodb+srv://iliana:moje@autohome.acegw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-app.config["MONGODB_HOST"] = DB_URI
+# DB_URI = "mongodb+srv://iliana:moje@autohome.acegw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+# app.config["MONGODB_HOST"] = DB_URI
 
 #setting up DB
 db = MongoEngine()
@@ -41,14 +43,13 @@ app.config['MQTT_REFRESH_TIME'] = 1.0  # refresh time in seconds
 mqtt = Mqtt(app)
 
 
-
 #model for room_data to be saved in DB
-class DBData(db.Document):
-		temperature = db.IntField()
-		light = db.IntField()
-		gas = db.IntField()
+class DB_data(db.Document):
+		temperature = db.FloatField()
+		light = db.FloatField()
+		gas = db.FloatField()
 		dust = db.FloatField()
-		humidity = db.IntField() 
+		humidity = db.FloatField() 
 
 		def to_json(self):
 			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity}
@@ -69,31 +70,32 @@ class Room:
 		self.dust = dust
 		self.humidity = humidity 
 	
-	def updateTemperature(self, temperature): 
+	def update_temperature(self, temperature): 
 		self.temperature = temperature
 
-	def updateLight(self, light): 
+	def update_light(self, light): 
 		self.light = light
 	
-	def updateDust(self, dust): 
+	def update_dust(self, dust): 
 		self.dust = dust
 	
-	def updateGas(self, gas): 
+	def update_gas(self, gas): 
 		self.gas = gas
 
-	def updateHumidity(self, humidity): 
+	def update_humidity(self, humidity): 
 		self.humidity = humidity
 		
-	def convertToPercent(self, var):
-		return var*100/4096
+	def convert_to_percent(self, var):
+		return float(var)*100/4096
 
-	def convertDust(self, var):
-		return var*100/0.5
+	def convert_dust(self, var):
+		return float(var)*100/0.5
+
+	def convert_light(self, var):
+		return 100.0 - float(var)*100/3000
 
 room_info = Room(0, 0, 0, 0, 0)
-# print(room_info.gas)
-
-      
+# print(room_info.gas) 
 
 #MQTT connection
 @mqtt.on_connect()
@@ -114,16 +116,35 @@ def handle_mqtt_message(client, userdata, message):
 				payload=message.payload.decode()
 		)
 		
-		# if(data['topic'] == "room/dust"):
-		# 	print(data['payload'])
-		# if(data['topic'] == "room/gas"):
-		# 	print(data['payload'])
-		# if(data['topic'] == "room/light"):
-		# 	print(data['payload'])
-		# if(data['topic'] == "room/temperature"):
-		# 	print(data['payload'])
-		# if(data['topic'] == "room/humidity"):
-		# 	print(data['payload'])
+		if(data['topic'] == "room/dust"):
+			room_info.update_dust(room_info.convert_dust(data['payload']))
+		if(data['topic'] == "room/gas"):
+			room_info.update_gas(room_info.convert_to_percent(data['payload']))
+		if(data['topic'] == "room/light"):
+			room_info.update_light(room_info.convert_light(data['payload']))
+		if(data['topic'] == "room/temperature"):
+			room_info.update_temperature(data['payload'])
+		if(data['topic'] == "room/humidity"):
+			room_info.update_humidity(data['payload'])
+
+# while True:
+# 	print("latching data to database")
+	# time.sleep(30.0 - ((time.time() - starttime) % 30.0))
+
+def send_data_to_DB():
+		# print(time.ctime())
+		print("latching data to database")
+		data = DB_data(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity)
+		data.save()
+		
+		try:
+			t = threading.Timer(10, send_data_to_DB)
+			t.daemon = True
+			t.start()
+		except KeyboardInterrupt:
+			print("Goodbye!")
+
+send_data_to_DB();
 
 #main route
 @app.route('/')
