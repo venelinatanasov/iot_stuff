@@ -3,6 +3,7 @@ from flask_scss import Scss
 from flask_mqtt import Mqtt
 from flask_mongoengine import MongoEngine
 import time, threading
+import datetime as dt
 # import pymongo
 
 # import RPi.GPIO as GPIO
@@ -50,6 +51,7 @@ class DB_data(db.Document):
 		gas = db.FloatField()
 		dust = db.FloatField()
 		humidity = db.FloatField() 
+		timestamp = db.DateTimeField()
 
 		def to_json(self):
 			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity}
@@ -62,6 +64,7 @@ class Room:
 		self.gas = gas
 		self.dust = dust
 		self.humidity = humidity 
+		self.timestamp = 0
 
 	def update(self, temperature, light, gas, dust, humidity): 
 		self.temperature = temperature
@@ -134,7 +137,7 @@ def handle_mqtt_message(client, userdata, message):
 def send_data_to_DB():
 		# print(time.ctime())
 		print("latching data to database")
-		data = DB_data(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity)
+		data = DB_data(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity, timestamp=dt.datetime.utcnow	)
 		data.save()
 		
 		try:
