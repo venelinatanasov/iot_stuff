@@ -25,7 +25,7 @@ void loop() {
   Serial.print("\nTemperature:   "); Serial.print(temp.temperature); Serial.println("C");//print Temperature
   Serial.print("Humidity:      "); Serial.print(humidity.relative_humidity); Serial.println("%RH");//print Relative Humidity
   Serial.print("Ambient light: "); Serial.print(Lux.GetLux()); Serial.println("lux");//print Ambient light
-  Serial.print("Gas: "); Serial.print((analogRead(A3)*100)/1024);Serial.println("%");
+  Serial.print("Gas: "); Serial.print(((float)(analogRead(A3)*100))/1024);Serial.println("%");
   
   delay(5000);
 }

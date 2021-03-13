@@ -30,17 +30,17 @@ while True:
 
 #Check what data is being sent and publish it to a respective MQTT topic:
     if ("Temperature" in ZBdata):
-        client.publish("outside/temperature", ZBdata)
-        print("Published " + ZBdata + " to \"outside/temperature\"")
+        client.publish("outside/temperature", ZBdata[15: -1])
+        print("Published " + ZBdata[15: -1] + " to \"outside/temperature\"")
     elif ("Humidity" in ZBdata):
-        client.publish("outside/humidity", ZBdata)
-        print("Published " + ZBdata + " to \"outside/humidity\"")
+        client.publish("outside/humidity", ZBdata[15: -3])
+        print("Published " + ZBdata[15: -3] + " to \"outside/humidity\"")
     elif ("Ambient light" in ZBdata):
-        client.publish("outside/light", ZBdata)
-        print("Published " + ZBdata + " to \"outside/light\"")
+        client.publish("outside/light", ZBdata[15: -3])
+        print("Published " + ZBdata[15: -3] + " to \"outside/light\"")
     elif("Gas" in ZBdata):
-        client.publish("outside/gas", ZBdata)
-        print("Published " + ZBdata + " to \"outside/light\"\n")
+        client.publish("outside/gas", ZBdata[5:-1])
+        print("Published " + ZBdata[5:-1] + " to \"outside/light\"\n")
 
 
     time.sleep(0.25)
