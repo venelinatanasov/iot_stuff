@@ -6,7 +6,7 @@
 #define light_pin 35
 #define esp_name ESP1
 #define door_pin 
-
+void callback(char* topic, byte* message, unsigned int length);
 
 #define particles_pin 32
 #define led_power 33
@@ -35,15 +35,22 @@ const char *TOPIC_TEMPERATURE = "room/temperature";
 const char *TOPIC_HUMIDITY = "room/humidity";
 
 
+const char *TOPIC_GOOGLE_ON_OFF = "lights/google_on_off";
+const char *TOPIC_ON_OFF = "lights/on_off";
+const char *TOPIC_AUTO = "lights/auto";
+
 
 IPAddress broker(192,168,100,253);
 WiFiClient wclient;
-PubSubClient client(wclient); // Setup MQTT client
+PubSubClient mqttclient(wclient); // Setup MQTT client
+//void light_control(char* topic, char* message, unsigned int lenght);
 
 
 AHT10 myAHT10(AHT10_ADDRESS_0X38);
 int aht_timeout;
 
+
+int auto_light=0;
 
 
 void setup() {
@@ -58,8 +65,8 @@ void setup() {
   setup_wifi(); // Connect to network
 
   
-  client.setServer(broker, 1883);
-
+  mqttclient.setServer(broker, 1883);
+  mqttclient.setCallback(callback);
   
   pinMode(led_power, OUTPUT);
   digitalWrite(led_power, HIGH);
@@ -94,19 +101,19 @@ int gas_error = 0;
 void loop() {
   
   
-  if (!client.connected())  // Reconnect if connection is lost
+  if (!mqttclient.connected())  // Reconnect if connection is lost
   {
     reconnect();
   }
-  client.loop();
+  mqttclient.loop();
   //gas
   int gas_val=read_gas(gas_pin);
   char gas[7];
   to_char_array(gas_val, gas);
   
-  client.publish(TOPIC_GAS, gas);
+  mqttclient.publish(TOPIC_GAS, gas);
   //Serial.println((String)TOPIC_GAS);
-  Serial.println(gas);
+  //Serial.println(gas);
 
   delay(100);
   
@@ -114,7 +121,13 @@ void loop() {
   int light_val = read_light(light_pin);
   char light[7];
   to_char_array(light_val, light);
-  client.publish(TOPIC_LIGHT, light);
+  mqttclient.publish(TOPIC_LIGHT, light);
+  if(auto_light&&light_val>900){
+    lightbulb_on();
+  }
+  if(auto_light&&light_val<700){
+    lightbulb_off();
+  }
   //Serial.println((String)TOPIC_LIGHT);
   //Serial.print(light);
   //Serial.println(light);
@@ -125,7 +138,7 @@ void loop() {
   to_char_array(dust_val,dust);
   //Serial.println(dust_val);
   //Serial.println(dust);
-  client.publish(TOPIC_DUST, dust);
+  mqttclient.publish(TOPIC_DUST, dust);
  
   if(dust_val>0.3){
     dust_error++;
@@ -151,18 +164,66 @@ void loop() {
   char temperature[7];
   to_char_array(temperature_val, temperature);
   //Serial.println(read_temperature());
-  client.publish(TOPIC_TEMPERATURE, temperature);
+  mqttclient.publish(TOPIC_TEMPERATURE, temperature);
 
   float humidity_val = read_humidity();
   char humidity[7];
   to_char_array(humidity_val, humidity);
   //Serial.println(read_humidity());
-  client.publish(TOPIC_HUMIDITY, humidity);
+  mqttclient.publish(TOPIC_HUMIDITY, humidity);
 
   aht_timeout=millis();
   }
   
 }
+
+
+void callback(char* topic, byte* message, unsigned int length){
+  Serial.println("callback");
+  Serial.println(topic);
+  //message[length]='\0';
+  char a = message[0];
+  if(!strcmp(topic, "lights/google_on_off")){
+    Serial.println("google");
+    Serial.println((char *)message);
+    
+    Serial.println(a);
+    if(a=='1'){
+      Serial.println("on");
+      lightbulb_on();
+    }
+    if(a=='0'){
+      lightbulb_off();
+    }
+    return;
+  }
+  if(!strcmp(topic, "lights/on_off")){
+    Serial.println(a);
+    if(a=='1'){
+      lightbulb_on();
+    }
+    if(a=='0'){
+      lightbulb_off();
+    }
+    return;
+  }
+  if(!strcmp(topic, "lights/auto")){
+    Serial.println(a);
+    if(a=='1'){
+      auto_light=1;
+    }
+    if(a=='0'){
+      auto_light=0;
+    }
+    return;
+  }
+  
+}
+
+
+
+
+
 
 float read_temperature(){
   return myAHT10.readTemperature();
@@ -312,14 +373,15 @@ void setup_wifi() {
 // Reconnect to client
 void reconnect() {
   // Loop until we're reconnected
-  while (!client.connected()) {
+  while (!mqttclient.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(ID)) {
+    if (mqttclient.connect(ID)) {
       Serial.println("connected");
       Serial.print("Publishing to: ");
       Serial.println(TOPIC_GAS);
       Serial.println('\n');
+      mqttclient.subscribe("lights/#");
 
     } else {
       Serial.println(" try again in 5 seconds");
