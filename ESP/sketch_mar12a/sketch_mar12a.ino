@@ -27,7 +27,7 @@ int resolution = 8;
 //setup
 const char *ssid =  "HackTues";   // name of your WiFi network
 const char *password =  "029925042"; // password of the WiFi network
-const char *ID = "esp_name";  // Name of our device, must be unique
+const char *ID = "Main_room";  // Name of our device, must be unique
 const char *TOPIC_GAS = "room/gas";  // TOPIC_GAS to subcribe to
 const char *TOPIC_LIGHT = "room/light"; //TOPIC_LIGHT for light sensor
 const char *TOPIC_DUST = "room/dust"; //TOPIC_DUST for dust sensor
