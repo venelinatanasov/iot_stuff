@@ -51,7 +51,7 @@ int aht_timeout;
 
 
 int auto_light=0;
-
+int on_off=0;
 
 void setup() {
 
@@ -191,9 +191,11 @@ void callback(char* topic, byte* message, unsigned int length){
     if(a=='1'){
       Serial.println("on");
       lightbulb_on();
+      on_off=1;
     }
     if(a=='0'){
       lightbulb_off();
+      on_off=0;
     }
     return;
   }
@@ -201,9 +203,11 @@ void callback(char* topic, byte* message, unsigned int length){
     Serial.println(a);
     if(a=='1'){
       lightbulb_on();
+      on_off=1;
     }
     if(a=='0'){
       lightbulb_off();
+      on_off=0;
     }
     return;
   }
@@ -238,10 +242,12 @@ float read_humidity(){
 
 void lightbulb_on(){
   digitalWrite(lightbulb, HIGH);
+  //on_off=1;
 }
 
 void lightbulb_off(){
   digitalWrite(lightbulb, LOW);
+  //on_off=0;
 }
 
 
@@ -254,6 +260,12 @@ void buzz(){
     ledcWrite(channel, 90);
     lightbulb_off();
     delay(500);
+  }
+  if(on_off){
+    lightbulb_on();
+  }
+  else{
+    lightbulb_off();
   }
   ledcWrite(channel, 0);
 }
