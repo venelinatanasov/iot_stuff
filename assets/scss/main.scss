@@ -1,5 +1,21 @@
 @import "colors";
+@import "basic_styles";
 
-:root {
+body {
   background-color: $glossy-grape;
 }
+* {
+	box-sizing: border-box;
+}
+
+.body-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	align-items: baseline;
+	justify-content: center;
+	align-self: baseline;
+	margin: 0 auto;
+
+}
+
