@@ -8,7 +8,8 @@
   text-align: center;
   vertical-align: middle;
   margin: 2px auto;
-  border-radius: 50px; }
+  border-radius: 50px;
+  margin-top: 10px; }
   .button .button-text {
     color: #f3ffe0;
     margin: 15px 10px;
@@ -23,16 +24,18 @@
   .subtitle {
     margin: 0px auto;
     padding: 0px;
-    font-size: 20px;
+    font-size: 30px;
     font-family: 'Comic Neue', cursive;
     color: #4b3f73; }
 
     .title {
-      font-size: 46px;
+      font-size: 100px;
       font-family: 'Comic Neue', cursive;
       color: #4b3f73;
-      margin: 10px auto 5px;
-      text-align: center;
+      margin: 30px auto;
+      padding-top: 40px;
+      ;
+text-align: center;
       line-height: 40px; }
 
       .text-shadow {
@@ -121,3 +124,20 @@
                       -o-animation-delay: 4s;
                       -moz-animation-delay: 4s;
                       animation-delay: 4s; }
+
+.ct-chart, #chart-1, #chart-2 {
+  margin: 0 auto;
+  padding: 50px;
+  width: 40%; }
+
+  .button-first {
+    margin-top: 60px; }
+
+    .ct-series-a .ct-line {
+      stroke: rgba(75, 63, 115, 0.7); }
+
+      .ct-series-a .ct-point {
+        stroke: #4b3f73; }
+
+        .ct-series-a .ct-bar {
+          stroke: rgba(75, 63, 115, 0.9); }

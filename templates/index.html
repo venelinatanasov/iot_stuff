@@ -5,11 +5,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<meta name="theme-color" content="#b39bd1">
-	<link rel="stylesheet" href="../static/css/main.css">
+	
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
 	<title>HomeAuto</title>
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;700&display=swap');
 	</style>
+  <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+  <link rel="stylesheet" href="../static/css/main.css">
 </head>
 
 <body>
@@ -17,17 +20,25 @@
 	</header>
 	<main class="body-wrapper text">
     <h1 class="title text-shadow">HomeAuto</h1>
-    <h2 class="subtitle text-shadow">Smart home automation system,</h2>
-    <h2 class="subtitle text-shadow">designed to save energy</h2>
-    <button class="button"><p class="button-text">Try it</p></button>
+    <h2 class="subtitle ">Smart home automation system,</h2>
+    <h2 class="subtitle ">designed to save energy</h2>
+    <button class="button button-first"><p class="button-text" onclick="plotTemp();">Temperature</p></button>
+    <button class="button"><p class="button-text" onclick="plotHumidity();">Humidity</p></button>
+    <!-- <button class="button"><p class="button-text" onclick="plotTemp();"></p></button> -->
 
     <form class="toggle-wrapper">
-      <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="0" name="choice_radio" id="yes_radio" onclick="turn_on();">
-      <label for="maybe_radio" id="maybe-lbl">auto</label><input type="radio" value="0" name="choice_radio" id="maybe_radio" checked="checked" onclick="turn_auto();">
+      <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="1" name="choice_radio" id="yes_radio" onclick="turn_on();">
+      <label for="maybe_radio" id="maybe-lbl">auto</label><input type="radio" value="2" name="choice_radio" id="maybe_radio" checked="checked" onclick="turn_auto();">
       <label for="no_radio" id="no-lbl">off</label><input type="radio" value="0" name="choice_radio" id="no_radio" onclick="turn_off();">
       
       <div class="toggle"></div>
     </form>
+
+    <!-- <div class="graphs"> -->
+      <div class="ct-chart ct-golden-section" id="chart1"></div>
+      <!-- <div class="ct-chart ct-golden-section" id="chart2"></div> -->
+    <!-- </div> -->
+   
   </main>
 	<footer class="footer-wrapper">
 	</footer>
@@ -38,7 +49,50 @@
   <!-- <script src='http://localhost:5000/socket.io/socket.io.js'></script> -->
   <script>
     // const socket = io.connect('http://' + document.domain + ':' + location.port + '/socket.io/socket.io.js');
-    
+  var options = {
+    seriesBarDistance: 15,
+    width: 600,
+    height: 400
+  };
+
+  var responsiveOptions = [
+    ['screen and (min-width: 641px) and (max-width: 1024px)', {
+      seriesBarDistance: 10,
+      axisX: {
+        labelInterpolationFnc: function (value) {
+          return value;
+        }
+      }
+    }],
+    ['screen and (max-width: 640px)', {
+      seriesBarDistance: 5,
+      axisX: {
+        labelInterpolationFnc: function (value) {
+          return value[0];
+        }
+      }
+    }]
+  ];
+
+    function plot(variable) {
+      new Chartist.Line('#chart1', {
+        // labels: [1, 2, 3, 4],
+        series: [variable.slice(1).slice(-20)]
+      }, options);
+    }
+
+    // new Chartist.Line('#chart1', {
+    //   labels: [1, 2, 3, 4],
+    //   series: [[100, 120, 180, 200]]
+    // }, options);
+
+  function plot_bar(variable) {
+    new Chartist.Bar('#chart1', {
+      // labels: [1, 2, 3, 4],
+      series: [variable.slice(1).slice(-20)]
+    }, options);
+  }
+
     function turn_on() {
       // event.preventDefault();
       $.ajax({
@@ -54,6 +108,7 @@
       
       return 200;
     }
+
     function turn_off() {
       // event.preventDefault();
 
@@ -65,14 +120,14 @@
 				url: '/off'
 			})
 			.done(function(data) {
-				console.log("Light will be turned off") 
+				console.log("Light will be turned off");
 			});
       return 200;
     }
+
     function turn_auto() {
       // event.preventDefault();
       
-        
       $.ajax({
 				data : {
 					light : 2
@@ -85,6 +140,37 @@
 			});
 
       return 200;
+    }
+
+    function toggle(variable) {
+      $('[name="radioSelectionName"]').removeAttr('checked');
+      $("input[name=mygroup][value=" + variable + "]").prop('checked', true);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+
+    }
+  
+    function plotTemp() {
+      $.ajax({
+				type: 'POST',
+				url: '/temp'
+			})
+			.done(function(data) {
+				console.log("Temperature stats plotted")
+        plot(data.temp)
+			});
+    }
+
+    function plotHumidity() {
+      $.ajax({
+				type: 'POST',
+				url: '/humidity'
+			})
+			.done(function(data) {
+				console.log("Humidity stats plotted")
+			});
     }
   </script>
 </body>

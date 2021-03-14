@@ -103,7 +103,35 @@ body {
   }
 }
 
+.ct-chart, #chart-1, #chart-2 {
+  margin: 0 auto;
+  padding: 50px;
+  width: 40%;
+}
 
+.button-first{
+  margin-top: 60px;;
+}
+
+// .graphs {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: baseline;
+
+//   div {
+
+//   }
+// }
+.ct-series-a .ct-line{
+  stroke: $cyber-grape-lighter;
+}
+.ct-series-a .ct-point {
+  stroke: $cyber-grape;
+}
+
+.ct-series-a .ct-bar  {
+  stroke: $cyber-grape-light
+}
 
 
 
