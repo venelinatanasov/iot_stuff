@@ -9,128 +9,139 @@ body {
 * {
 	box-sizing: border-box;
 }
+.wrapper{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  // align-items: baseline;
+  justify-content: center;
+  align-self: baseline;
+  
+  .ct-chart {
+    // display: flex;
+    // align-items: baseline;
+    // padding: auto;
+    // margin: 0;
+    // position: absolute;
+    // top: 50%;
+    // -ms-transform: translateY(-50%);
+    // transform: translateY(-50%);
+  }
 
-.body-wrapper {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: column;
-	align-items: baseline;
-	justify-content: center;
-	align-self: baseline;
-	margin: 0 auto;
+  .body-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: baseline;
+    justify-content: center;
+    align-self: baseline;
+    margin: 0 auto;
+    padding:10px auto;
 
-  .toggle-wrapper {
-    width: $w;
-    height: $h;
-    position: relative;
-    margin: 2rem auto;
-    border-radius: $h/2;
-    background: $cyber-grape-light;
-
-    & .toggle {
-      width: $tw;
-      height: $tw;
-      position: absolute;
-      left: $w / 3 - ($tw - $h) / 2;
-      top: -($tw - $h) / 2;
-      border-radius: 50%;
-      box-sizing: border-box;
-      @include borderColor(2);
-      
-      transition:
-        all .3s cubic-bezier(
-          0.175, 0.885, 0.320, 1.275
-        );
-    }
-
-    & label {
-      cursor: pointer;
-      width: $h;
+    .toggle-wrapper {
+      width: $w;
       height: $h;
-      position: absolute;
-      margin: 0;
-      padding: 0;
-      z-index: 1;
-      display: inline-block;  
+      position: relative;
+      margin: 2rem auto;
+      border-radius: $h/2;
+      background: $cyber-grape-light;
+
+      & .toggle {
+        width: $tw;
+        height: $tw;
+        position: absolute;
+        left: $w / 3 - ($tw - $h) / 2;
+        top: -($tw - $h) / 2;
+        border-radius: 50%;
+        box-sizing: border-box;
+        @include borderColor(2);
+        
+        transition:
+          all .3s cubic-bezier(
+            0.175, 0.885, 0.320, 1.275
+          );
+      }
+
+      & label {
+        cursor: pointer;
+        width: $h;
+        height: $h;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        z-index: 1;
+        display: inline-block;  
+        
+        text-align: center;
+        line-height: $h;
+        text-transform: uppercase;
+        font-family: 'Lato', sans-serif;
+        font-size: $fs;
+        font-weight: bold;
+        color: $text-color;
+        @include animation($ta);
+      }
       
-      text-align: center;
-      line-height: $h;
-      text-transform: uppercase;
-      font-family: 'Lato', sans-serif;
-      font-size: $fs;
-      font-weight: bold;
-      color: $text-color;
-      @include animation($ta);
+      & input {
+        position: absolute;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+      }
     }
-    
-    & input {
-      position: absolute;
-      left: 0;
-      margin: 0;
-      padding: 0;
-      opacity: 0;
+
+    #yes_radio:checked {
+      ~ .toggle {
+        @include borderColor(1);
+        left: -($tw - $h) / 2;
+      }
+    }
+
+    #no_radio:checked {
+      ~ .toggle {
+        @include borderColor(3);
+        left: $w * 2 / 3 - ($tw - $h) / 2;
+      }
+    }
+
+    #maybe_radio, #maybe-lbl {
+      left: 100% * 1 / 3;
+    }
+
+    #no_radio, #no-lbl {
+      left: 100% * 2 / 3;
+    }
+
+    #maybe-lbl {
+      @include animationDelay($ta / 3);
+    }
+
+    #no-lbl {
+      @include animationDelay($ta * 2 / 3);
     }
   }
 
-  #yes_radio:checked {
-    ~ .toggle {
-      @include borderColor(1);
-      left: -($tw - $h) / 2;
-    }
+  .ct-chart, #chart-1, #chart-2 {
+    margin: auto;
+    padding: 50px;
+    width: 40%;
   }
 
-  #no_radio:checked {
-    ~ .toggle {
-      @include borderColor(3);
-      left: $w * 2 / 3 - ($tw - $h) / 2;
-    }
+  .button-first{
+    margin-top: 40px;;
   }
 
-  #maybe_radio, #maybe-lbl {
-    left: 100% * 1 / 3;
+  .ct-series-a .ct-line{
+    stroke: $cyber-grape-lighter;
+  }
+  .ct-series-a .ct-point {
+    stroke: $cyber-grape;
   }
 
-  #no_radio, #no-lbl {
-    left: 100% * 2 / 3;
+  .ct-series-a .ct-bar  {
+    stroke: $cyber-grape-light
   }
-
-  #maybe-lbl {
-    @include animationDelay($ta / 3);
-  }
-
-  #no-lbl {
-    @include animationDelay($ta * 2 / 3);
-  }
-}
-
-.ct-chart, #chart-1, #chart-2 {
-  margin: 0 auto;
-  padding: 50px;
-  width: 40%;
-}
-
-.button-first{
-  margin-top: 60px;;
-}
-
-// .graphs {
-//   display: flex;
-//   flex-direction: column;
-//   align-items: baseline;
-
-//   div {
-
-//   }
-// }
-.ct-series-a .ct-line{
-  stroke: $cyber-grape-lighter;
-}
-.ct-series-a .ct-point {
-  stroke: $cyber-grape;
-}
-
-.ct-series-a .ct-bar  {
-  stroke: $cyber-grape-light
 }
 
 

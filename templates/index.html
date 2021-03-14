@@ -18,30 +18,27 @@
 <body>
 	<header class="header-wrapper">
 	</header>
-	<main class="body-wrapper text">
-    <h1 class="title text-shadow">HomeAuto</h1>
-    <h2 class="subtitle ">Smart home automation system,</h2>
-    <h2 class="subtitle ">designed to save energy</h2>
-    <button class="button button-first"><p class="button-text" onclick="plotTemp();">Temperature</p></button>
-    <button class="button"><p class="button-text" onclick="plotHumidity();">Humidity</p></button>
-    <button class="button"><p class="button-text" onclick="plotDust();">Dust</p></button>
-    <button class="button"><p class="button-text" onclick="plotGas();">Gas</p></button>
-    <button class="button"><p class="button-text" onclick="plotLight();">Light</p></button>
-    
-
-    <form class="toggle-wrapper">
-      <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="1" name="choice_radio" id="yes_radio" onclick="turn_on();">
-      <label for="maybe_radio" id="maybe-lbl">auto</label><input type="radio" value="2" name="choice_radio" id="maybe_radio" checked="checked" onclick="turn_auto();">
-      <label for="no_radio" id="no-lbl">off</label><input type="radio" value="0" name="choice_radio" id="no_radio" onclick="turn_off();">
+	<main class="wrapper">
+    <div class="body-wrapper text">
+      <h1 class="title text-shadow">HomeAuto</h1>
+      <h2 class="subtitle ">Smart home automation system,</h2>
+      <h2 class="subtitle ">designed to save energy</h2>
+      <button class="button button-first"><p class="button-text" onclick="plotTemp();">Temperature</p></button>
+      <button class="button"><p class="button-text" onclick="plotHumidity();">Humidity</p></button>
+      <button class="button"><p class="button-text" onclick="plotDust();">Dust</p></button>
+      <button class="button"><p class="button-text" onclick="plotGas();">Gas</p></button>
+      <button class="button"><p class="button-text" onclick="plotLight();">Light</p></button>
       
-      <div class="toggle"></div>
-    </form>
 
-    <!-- <div class="graphs"> -->
-      <div class="ct-chart ct-golden-section" id="chart1"></div>
-      <!-- <div class="ct-chart ct-golden-section" id="chart2"></div> -->
-    <!-- </div> -->
-   
+      <form class="toggle-wrapper">
+        <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="1" name="choice_radio" id="yes_radio" onclick="turn_on();">
+        <label for="maybe_radio" id="maybe-lbl">auto</label><input type="radio" value="2" name="choice_radio" id="maybe_radio" checked="checked" onclick="turn_auto();">
+        <label for="no_radio" id="no-lbl">off</label><input type="radio" value="0" name="choice_radio" id="no_radio" onclick="turn_off();">
+        
+        <div class="toggle"></div>
+      </form>
+    </div>
+    <div class="ct-chart ct-golden-section" id="chart1"></div>
   </main>
 	<footer class="footer-wrapper">
 	</footer>
@@ -83,11 +80,6 @@
         series: [variable.slice(1).slice(-20)]
       }, options);
     }
-
-    // new Chartist.Line('#chart1', {
-    //   labels: [1, 2, 3, 4],
-    //   series: [[100, 120, 180, 200]]
-    // }, options);
 
   function plot_bar(variable) {
     new Chartist.Bar('#chart1', {

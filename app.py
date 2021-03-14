@@ -158,7 +158,6 @@ def handle_mqtt_message(client, userdata, message):
 		if(data['topic'] == "room/humidity"):
 			room_info.update_humidity(data['payload'])
 
-		
 		if(data['topic'] == "lights/google_on_off"):
 			print("in")
 			if(data['payload'] == '1'):
