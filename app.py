@@ -65,6 +65,18 @@ class DB_data(db.Document):
 		def getTemp(self):
 			return self.temperature
 
+		def getHumidity(self):
+			return self.humidity
+
+		def getLight(self):
+			return self.light
+
+		def getDust(self):
+			return self.dust
+
+		def getGas(self):
+			return self.gas
+
 		def to_json(self):
 			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity, "timestamp": self.timestamp}
 
@@ -219,6 +231,46 @@ def get_temperature_stats():
 			temp.append(i.getTemp())
 		print(temp)
 		return jsonify({'temp' : temp})
+
+@app.route('/humidity', methods = ['POST', 'GET'])
+def get_humidity_stats():
+	if request.method == 'POST':
+		hum = []
+		queries = DB_data.objects()
+
+		for i in queries:
+			hum.append(i.getHumidity())
+		return jsonify({'humidity' : hum})
+
+@app.route('/gas', methods = ['POST', 'GET'])
+def get_gas_stats():
+	if request.method == 'POST':
+		gas = []
+		queries = DB_data.objects()
+
+		for i in queries:
+			gas.append(i.getGas())
+		return jsonify({'gas' : gas})
+
+@app.route('/dust', methods = ['POST', 'GET'])
+def get_dust_stats():
+	if request.method == 'POST':
+		dust = []
+		queries = DB_data.objects()
+
+		for i in queries:
+			dust.append(i.getDust())
+		return jsonify({'dust' : dust})
+
+@app.route('/light', methods = ['POST', 'GET'])
+def get_light_stats():
+	if request.method == 'POST':
+		light = []
+		queries = DB_data.objects()
+
+		for i in queries:
+			light.append(i.getLight())
+		return jsonify({'light' : light})
 
 
 if __name__ == '__main__':

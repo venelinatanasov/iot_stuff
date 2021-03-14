@@ -24,7 +24,10 @@
     <h2 class="subtitle ">designed to save energy</h2>
     <button class="button button-first"><p class="button-text" onclick="plotTemp();">Temperature</p></button>
     <button class="button"><p class="button-text" onclick="plotHumidity();">Humidity</p></button>
-    <!-- <button class="button"><p class="button-text" onclick="plotTemp();"></p></button> -->
+    <button class="button"><p class="button-text" onclick="plotDust();">Dust</p></button>
+    <button class="button"><p class="button-text" onclick="plotGas();">Gas</p></button>
+    <button class="button"><p class="button-text" onclick="plotLight();">Light</p></button>
+    
 
     <form class="toggle-wrapper">
       <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="1" name="choice_radio" id="yes_radio" onclick="turn_on();">
@@ -170,6 +173,40 @@
 			})
 			.done(function(data) {
 				console.log("Humidity stats plotted")
+        plot(data.humidity)
+			});
+    }
+
+      function plotDust() {
+      $.ajax({
+				type: 'POST',
+				url: '/dust'
+			})
+			.done(function(data) {
+				console.log("Dust stats plotted")
+        plot(data.dust)
+			});
+    }
+
+      function plotGas() {
+      $.ajax({
+				type: 'POST',
+				url: '/gas'
+			})
+			.done(function(data) {
+				console.log("Gas stats plotted")
+        plot(data.gas)
+			});
+    }
+
+      function plotLight() {
+      $.ajax({
+				type: 'POST',
+				url: '/light'
+			})
+			.done(function(data) {
+				console.log("Light stats plotted")
+        plot(data.light)
 			});
     }
   </script>
