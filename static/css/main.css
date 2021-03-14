@@ -130,15 +130,19 @@
                         -o-animation-delay: 4s;
                         -moz-animation-delay: 4s;
                         animation-delay: 4s; }
-              .wrapper .ct-chart, .wrapper #chart-1, .wrapper #chart-2 {
-                margin: auto;
-                padding: 50px;
-                width: 40%; }
-                .wrapper .button-first {
-                  margin-top: 40px; }
-                  .wrapper .ct-series-a .ct-line {
-                    stroke: rgba(75, 63, 115, 0.7); }
-                    .wrapper .ct-series-a .ct-point {
-                      stroke: #4b3f73; }
-                      .wrapper .ct-series-a .ct-bar {
-                        stroke: rgba(75, 63, 115, 0.9); }
+              .wrapper #picture {
+                width: 600px;
+                height: 400px;
+                padding-right: 40px; }
+                .wrapper .ct-chart, .wrapper #chart-1, .wrapper #chart-2 {
+                  margin: auto;
+                  padding: 50px;
+                  width: 40%; }
+                  .wrapper .button-first {
+                    margin-top: 40px; }
+                    .wrapper .ct-series-a .ct-line {
+                      stroke: rgba(75, 63, 115, 0.7); }
+                      .wrapper .ct-series-a .ct-point {
+                        stroke: #4b3f73; }
+                        .wrapper .ct-series-a .ct-bar {
+                          stroke: rgba(75, 63, 115, 0.9); }

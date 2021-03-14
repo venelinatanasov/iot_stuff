@@ -12,14 +12,12 @@ import datetime as dt
 # from pymongo_document import documents
 # from pymodm import MongoModel, fields
 
-# import RPi.GPIO as GPIO
-# import serial
-# from os import system
-# import multiprocessing
 starttime = time.time()
 
 app = Flask(__name__)
 app.testing = True
+global started 
+started = False
 
 #MongoDB settings + client
 DB_URI = "mongodb+srv://iliana:moje@autohome.acegw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
@@ -120,9 +118,10 @@ class Room:
 		return float(var)*100/0.5
 
 	def convert_light(self, var):
-		return 100.0 - float(var)*100/3000
+		return 100.0 - float(var)*100/1500
 
 room_info = Room(0, 0, 0, 0, 0)
+
 # print(room_info.gas) 
 
 #MQTT connection
@@ -147,15 +146,15 @@ def handle_mqtt_message(client, userdata, message):
 
 		print(data['topic'] + data['payload'])
 		
-		if(data['topic'] == "room/dust"):
+		if(data['topic'] == "room/dust" and (data['payload']) != 0.0):
 			room_info.update_dust(room_info.convert_dust(data['payload']))
-		if(data['topic'] == "room/gas"):
+		if(data['topic'] == "room/gas" and (data['payload']) != 0.0):
 			room_info.update_gas(room_info.convert_to_percent(data['payload']))
-		if(data['topic'] == "room/light"):
+		if(data['topic'] == "room/light" and (data['payload']) != 0.0):
 			room_info.update_light(room_info.convert_light(data['payload']))
-		if(data['topic'] == "room/temperature"):
+		if(data['topic'] == "room/temperature" and (data['payload']) != 0.0):
 			room_info.update_temperature(data['payload'])
-		if(data['topic'] == "room/humidity"):
+		if(data['topic'] == "room/humidity" and (data['payload']) != 0.0):
 			room_info.update_humidity(data['payload'])
 
 		if(data['topic'] == "lights/google_on_off"):
@@ -177,9 +176,13 @@ def handle_mqtt_message(client, userdata, message):
 
 def send_data_to_DB():
 		# print(time.ctime())
-		print("latching data to database")
-		data = DB_data(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity, timestamp=dt.datetime.utcnow	)
-		data.save()
+		global started
+		if(started):
+			print("latching data to database")
+			data = DB_data(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity, timestamp=dt.datetime.utcnow	)
+			data.save()
+		else:	
+			started = True
 		
 		try:
 			t = threading.Timer(10, send_data_to_DB)
