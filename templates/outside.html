@@ -12,43 +12,33 @@
 		@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;700&display=swap');
 	</style>
   <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
-  <link rel="stylesheet" href="../static/css/main.css">
+  <link rel="stylesheet" href="../static/css/outside.css">
 </head>
 
 <body>
 	<header class="header-wrapper">
 	</header>
 	<main class="wrapper">
+    <div class="ct-chart ct-golden-section" id="chart1"><img id="picture" src="../static/svgs/garden.svg" alt=""></div>
     <div class="body-wrapper text">
-      <h1 class="title text-shadow">HomeAuto</h1>
+      <h1 class="title text-shadow">OutAuto</h1>
       <h2 class="subtitle ">Smart home automation system,</h2>
       <h2 class="subtitle ">designed to save energy</h2>
       <button class="button button-first"><p class="button-text" onclick="plotTemp();">Temperature</p></button>
       <button class="button"><p class="button-text" onclick="plotHumidity();">Humidity</p></button>
       <button class="button"><p class="button-text" onclick="plotDust();">Dust</p></button>
       <button class="button"><p class="button-text" onclick="plotGas();">Gas</p></button>
-      <button class="button"><p class="button-text" onclick="plotLight();">Light</p></button>
-      
-
-      <form class="toggle-wrapper">
-        <label for="yes_radio" id="yes-lbl">on</label><input type="radio" value="1" name="choice_radio" id="yes_radio" onclick="turn_on();">
-        <label for="maybe_radio" id="maybe-lbl">auto</label><input type="radio" value="2" name="choice_radio" id="maybe_radio" checked="checked" onclick="turn_auto();">
-        <label for="no_radio" id="no-lbl">off</label><input type="radio" value="0" name="choice_radio" id="no_radio" onclick="turn_off();">
-        
-        <div class="toggle"></div>
+    
       </form>
     </div>
-    <div class="ct-chart ct-golden-section" id="chart1"><img id="picture" src="../static/svgs/home.svg" alt=""></div>
+    <a id="head" href="http://127.0.0.1:5000/"><img src="../static/svgs/button.png" id="fixedbutton"></a>
   </main>
 	<footer class="footer-wrapper">
 	</footer>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script> -->
-  <!-- <script src='http://localhost:5000/socket.io/socket.io.js'></script> -->
   <script>
-    // const socket = io.connect('http://' + document.domain + ':' + location.port + '/socket.io/socket.io.js');
+    
   var options = {
     seriesBarDistance: 15,
     width: 600,
@@ -90,59 +80,6 @@
     }, options);
   }
 
-    function turn_on() {
-      // event.preventDefault();
-      $.ajax({
-				data : {
-					light : 1
-				},
-				type: 'POST',
-				url: '/on'
-			})
-			.done(function(data) {
-				console.log("Light will be turned on") 
-			});
-      
-      return 200;
-    }
-
-    function turn_off() {
-      // event.preventDefault();
-
-      $.ajax({
-				data : {
-					light : 1
-				},
-				type: 'POST',
-				url: '/off'
-			})
-			.done(function(data) {
-				console.log("Light will be turned off");
-			});
-      return 200;
-    }
-
-    function turn_auto() {
-      // event.preventDefault();
-      
-      $.ajax({
-				data : {
-					light : 2
-				},
-				type: 'POST',
-				url: '/auto'
-			})
-			.done(function(data) {
-				console.log("Light will be automatically turned on or off")
-			});
-
-      return 200;
-    }
-
-    function toggle(variable) {
-      $('[name="radioSelectionName"]').removeAttr('checked');
-      $("input[name=mygroup][value=" + variable + "]").prop('checked', true);
-    }
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
@@ -152,7 +89,7 @@
     function plotTemp() {
       $.ajax({
 				type: 'POST',
-				url: '/temp'
+				url: '/temp-o'
 			})
 			.done(function(data) {
 				console.log("Temperature stats plotted")
@@ -163,7 +100,7 @@
     function plotHumidity() {
       $.ajax({
 				type: 'POST',
-				url: '/humidity'
+				url: '/humidity-o'
 			})
 			.done(function(data) {
 				console.log("Humidity stats plotted")
@@ -174,7 +111,7 @@
       function plotDust() {
       $.ajax({
 				type: 'POST',
-				url: '/dust'
+				url: '/dust-o'
 			})
 			.done(function(data) {
 				console.log("Dust stats plotted")
@@ -185,7 +122,7 @@
       function plotGas() {
       $.ajax({
 				type: 'POST',
-				url: '/gas'
+				url: '/gas-o'
 			})
 			.done(function(data) {
 				console.log("Gas stats plotted")
@@ -193,16 +130,6 @@
 			});
     }
 
-      function plotLight() {
-      $.ajax({
-				type: 'POST',
-				url: '/light'
-			})
-			.done(function(data) {
-				console.log("Light stats plotted")
-        plot(data.light)
-			});
-    }
   </script>
 </body>
 </html

@@ -1,0 +1,71 @@
+@import "colors";
+@import "basic_styles";
+@import "variables";
+
+body {
+  background-color: $light-green;
+}
+* {
+	box-sizing: border-box;
+}
+.wrapper{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  // align-items: baseline;
+  justify-content: center;
+  align-self: baseline;
+
+  .body-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: baseline;
+    justify-content: center;
+    align-self: baseline;
+    margin: 0 auto;
+    padding:10px auto;
+  }
+
+  #picture {
+    width: 500px;
+    height: 400px;
+    padding-top: 40px;
+    text-align: center;
+  }
+
+  .ct-chart, #chart-1, #chart-2 {
+    margin: auto;
+    padding: 50px;
+    width: 40%;
+  }
+
+  .button-first{
+    margin-top: 40px;;
+  }
+
+  .ct-series-a .ct-line{
+    stroke: $metallic-seaweed
+  }
+  .ct-series-a .ct-point {
+    stroke: $metallic-seaweed
+  }
+
+  .ct-series-a .ct-bar  {
+    stroke: $metallic-seaweed
+  }
+}
+
+.button {
+  background-color: $metallic-seaweed;
+}
+
+
+.subtitle {
+	color: $metallic-seaweed
+}
+
+.title {
+  color: $metallic-seaweed;
+  padding-top: 80px;
+}

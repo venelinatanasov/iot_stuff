@@ -52,7 +52,7 @@ app.config['SECRET_KEY'] = 'secret!'
 # socketio = SocketIO(app, async_mode="threading")
 
 #model for room_data to be saved in DB
-class DB_data(db.Document):
+class DB_data_room(db.Document):
 		temperature = db.FloatField()
 		light = db.FloatField()
 		gas = db.FloatField()
@@ -78,8 +78,38 @@ class DB_data(db.Document):
 		def to_json(self):
 			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity, "timestamp": self.timestamp}
 
+class DB_data_out(db.Document):
+		temperature = db.FloatField()
+		gas = db.FloatField()
+		dust = db.FloatField()
+		humidity = db.FloatField() 
+		timestamp = db.DateTimeField()
+
+		def getTemp(self):
+			return self.temperature
+
+		def getHumidity(self):
+			return self.humidity
+
+		def getLight(self):
+			return self.light
+
+		def getDust(self):
+			return self.dust
+
+		def getGas(self):
+			return self.gas
+
+		def to_json(self):
+			return{"temperature": self.temperature, "light": self.light, "gas": self.gas, "dust": self.dust, "humidity": self.humidity, "timestamp": self.timestamp}
+
+
 #class to hold data locally
-class Room:
+class Room():
+	meta = {
+    'collection': 'room'
+  }
+
 	def __init__(self, temperature, light, gas, dust, humidity): 
 		self.temperature = temperature
 		self.light = light
@@ -120,8 +150,53 @@ class Room:
 	def convert_light(self, var):
 		return 100.0 - float(var)*100/1500
 
+
 room_info = Room(0, 0, 0, 0, 0)
 
+#class to hold data locally
+class Out():
+	meta = {
+    'collection': 'out'
+  }
+
+	def __init__(self, temperature, gas, dust, humidity): 
+		self.temperature = temperature
+		self.gas = gas
+		self.dust = dust
+		self.humidity = humidity 
+		self.timestamp = dt.datetime.utcnow
+
+	def update(self, temperature, gas, dust, humidity): 
+		self.temperature = temperature
+		self.gas = gas
+		self.dust = dust
+		self.humidity = humidity 
+		self.timestamp = dt.datetime.utcnow
+	
+	def update_temperature(self, temperature): 
+		self.temperature = temperature
+	
+	def update_dust(self, dust): 
+		self.dust = dust
+	
+	def update_gas(self, gas): 
+		self.gas = gas
+
+	def update_humidity(self, humidity): 
+		self.humidity = humidity
+		
+	def convert_to_percent(self, var):
+		return float(var)*100/4096
+
+	def convert_dust(self, var):
+		return float(var)*100/0.5
+
+	def convert_light(self, var):
+		return 100.0 - float(var)*100/1500
+
+
+
+out_info = Out(0, 0, 0, 0)
 # print(room_info.gas) 
 
 #MQTT connection
@@ -129,6 +204,7 @@ room_info = Room(0, 0, 0, 0, 0)
 def handle_connect(client, userdata, flags, rc):
 		mqtt.subscribe('room/#')
 		mqtt.subscribe('lights/#')
+		mqtt.subscribe('outside/#')
 		print("connected")
 		# mqtt.subscribe('room/gas')	 #230/4096
 		# mqtt.subscribe('room/light') #546/4096
@@ -157,6 +233,15 @@ def handle_mqtt_message(client, userdata, message):
 		if(data['topic'] == "room/humidity" and (data['payload']) != 0.0):
 			room_info.update_humidity(data['payload'])
 
+		if(data['topic'] == "outside/dust" and (data['payload']) != 0.0):
+			out_info.update_dust(room_info.convert_dust(data['payload']))
+		if(data['topic'] == "outside/gas" and (data['payload']) != 0.0):
+			out_info.update_gas(room_info.convert_to_percent(data['payload']))
+		if(data['topic'] == "outside/temperature" and (data['payload']) != 0.0):
+			out_info.update_temperature(data['payload'])
+		if(data['topic'] == "outside/humidity" and (data['payload']) != 0.0):
+			out_info.update_humidity(data['payload'])
+
 		if(data['topic'] == "lights/google_on_off"):
 			print("in")
 			if(data['payload'] == '1'):
@@ -175,11 +260,10 @@ def handle_mqtt_message(client, userdata, message):
 	# time.sleep(30.0 - ((time.time() - starttime) % 30.0))
 
 def send_data_to_DB():
-		# print(time.ctime())
 		global started
 		if(started):
 			print("latching data to database")
-			data = DB_data(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity, timestamp=dt.datetime.utcnow	)
+			data = DB_data_room(temperature=room_info.temperature, light=room_info.light, gas=room_info.gas, dust=room_info.dust, humidity=room_info.humidity, timestamp=dt.datetime.utcnow)
 			data.save()
 		else:	
 			started = True
@@ -191,13 +275,34 @@ def send_data_to_DB():
 		except KeyboardInterrupt:
 			print("Goodbye!")
 
-send_data_to_DB();
+def send_data_to_out_DB():
+		global started
+		if(started):
+			print("latching data to database")
+			data2 = DB_data_out(temperature=out_info.temperature, gas=out_info.gas, dust=out_info.dust, humidity=out_info.humidity, timestamp=dt.datetime.utcnow)
+			data2.save()
+		else:	
+			started = True
+		
+		try:
+			t = threading.Timer(10, send_data_to_out_DB)
+			t.daemon = True
+			t.start()
+		except KeyboardInterrupt:
+			print("Goodbye!")
+
+
 
 #main route
 @app.route('/', methods = ['POST', 'GET'])
 def index():
-
+	send_data_to_DB()
 	return render_template('index.html')
+
+@app.route('/outside', methods = ['POST', 'GET'])
+def outside():
+	send_data_to_out_DB()
+	return render_template('outside.html')
 
 @app.route('/on', methods = ['POST', 'GET'])
 def turn_light_on():
@@ -226,7 +331,7 @@ def get_temperature_stats():
 	if request.method == 'POST':
 		# temp = request.args.get('temp')
 		temp = []
-		queries = DB_data.objects()
+		queries = DB_data_room.objects()
 		# temps = db.d_b_data.find({}, {temperature:1, timestamp:1})
 
 		for i in queries:
@@ -238,7 +343,7 @@ def get_temperature_stats():
 def get_humidity_stats():
 	if request.method == 'POST':
 		hum = []
-		queries = DB_data.objects()
+		queries = DB_data_room.objects()
 
 		for i in queries:
 			hum.append(i.getHumidity())
@@ -248,7 +353,7 @@ def get_humidity_stats():
 def get_gas_stats():
 	if request.method == 'POST':
 		gas = []
-		queries = DB_data.objects()
+		queries = DB_data_room.objects()
 
 		for i in queries:
 			gas.append(i.getGas())
@@ -258,7 +363,7 @@ def get_gas_stats():
 def get_dust_stats():
 	if request.method == 'POST':
 		dust = []
-		queries = DB_data.objects()
+		queries = DB_data_room.objects()
 
 		for i in queries:
 			dust.append(i.getDust())
@@ -268,11 +373,54 @@ def get_dust_stats():
 def get_light_stats():
 	if request.method == 'POST':
 		light = []
-		queries = DB_data.objects()
+		queries = DB_data_room.objects()
 
 		for i in queries:
 			light.append(i.getLight())
 		return jsonify({'light' : light})
+
+@app.route('/temp-o', methods = ['POST', 'GET'])
+def get_temperature_stats_o():
+	if request.method == 'POST':
+		# temp = request.args.get('temp')
+		temp = []
+		queries = DB_data_out.objects()
+		# temps = db.d_b_data.find({}, {temperature:1, timestamp:1})
+
+		for i in queries:
+			temp.append(i.getTemp())
+		print(temp)
+		return jsonify({'temp' : temp})
+
+@app.route('/humidity-o', methods = ['POST', 'GET'])
+def get_humidity_stats_o():
+	if request.method == 'POST':
+		hum = []
+		queries = DB_data_out.objects()
+
+		for i in queries:
+			hum.append(i.getHumidity())
+		return jsonify({'humidity' : hum})
+
+@app.route('/gas-o', methods = ['POST', 'GET'])
+def get_gas_stats_o():
+	if request.method == 'POST':
+		gas = []
+		queries = DB_data_out.objects()
+
+		for i in queries:
+			gas.append(i.getGas())
+		return jsonify({'gas' : gas})
+
+@app.route('/dust-o', methods = ['POST', 'GET'])
+def get_dust_stats_o():
+	if request.method == 'POST':
+		dust = []
+		queries = DB_data_out.objects()
+
+		for i in queries:
+			dust.append(i.getDust())
+		return jsonify({'dust' : dust})
 
 
 if __name__ == '__main__':

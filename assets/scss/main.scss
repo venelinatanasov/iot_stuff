@@ -1,7 +1,6 @@
 @import "colors";
 @import "basic_styles";
 @import "variables";
-// @import "compass/css3";
 
 body {
   background-color: $glossy-grape;
@@ -16,17 +15,6 @@ body {
   // align-items: baseline;
   justify-content: center;
   align-self: baseline;
-  
-  .ct-chart {
-    // display: flex;
-    // align-items: baseline;
-    // padding: auto;
-    // margin: 0;
-    // position: absolute;
-    // top: 50%;
-    // -ms-transform: translateY(-50%);
-    // transform: translateY(-50%);
-  }
 
   .body-wrapper {
     display: flex;
@@ -150,5 +138,14 @@ body {
   }
 }
 
+.button {
+  background-color: $cyber-grape-light;
+}
 
+.subtitle {
+	color: $cyber-grape;
+}
 
+.title {
+  color: $cyber-grape;
+}
